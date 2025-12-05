@@ -1,0 +1,31 @@
+# --- Python & Flask ---
+__pycache__/
+*.py[cod]
+*$py.class
+instance/
+.pytest_cache/
+.coverage
+htmlcov/
+venv/
+.virtualenvs/
+Pipfile.lock
+
+# --- Variables de Entorno y Secretos (CRITICO) ---
+.env
+.env.local
+.env.*.local
+
+# --- Base de Datos Local ---
+*.sqlite
+*.sqlite3
+db.sqlite
+
+# --- Node & Frontend ---
+node_modules/
+dist/
+build/
+.DS_Store
+
+# --- Logs ---
+*.log
+npm-debug.log*
