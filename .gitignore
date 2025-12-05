@@ -1,31 +1,32 @@
-# --- Python & Flask ---
-__pycache__/
-*.py[cod]
-*$py.class
-instance/
-.pytest_cache/
-.coverage
-htmlcov/
-venv/
-.virtualenvs/
-Pipfile.lock
+# --- MASTER GITIGNORE ---
 
-# --- Variables de Entorno y Secretos (CRITICO) ---
+# 1. SECRETOS Y ENTORNO
 .env
 .env.local
 .env.*.local
+REFACTOR_REPORT.md
+instance/
 
-# --- Base de Datos Local ---
+# 2. PYTHON / BACKEND
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.virtualenvs/
+Pipfile.lock
 *.sqlite
 *.sqlite3
 db.sqlite
 
-# --- Node & Frontend ---
+# 3. NODE / FRONTEND 
 node_modules/
 dist/
-build/
-.DS_Store
+dist-ssr/
+*.local
+.npm/
 
-# --- Logs ---
+# 4. IDE / SISTEMA
+.DS_Store
+.vscode/
 *.log
 npm-debug.log*
