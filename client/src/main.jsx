@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./routes";
-import { StoreProvider } from "./hooks/useGlobalReducer";
+import { StoreProvider } from "./common/hooks/useGlobalReducer";
 import AuthProvider from "./context/AuthProvider.jsx";
 
 // Estilos de librerías
