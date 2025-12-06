@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthProvider";
+import { useFetch } from "../../../common/hooks/useFetch";
+import { apiClient } from "../../../common/api/apiClient";
 
 export const GradeEntryPage = () => {
+  const { store } = useAuth();
+  const token = store.access_token;
+
+  const { data: profileData } = useFetch("/api/profile");
+  const { data: gradesData } = useFetch("/api/setup/grade_levels");
+  const { data: periodsData } = useFetch("/api/periods");
+
+  const grade = gradesData || [];
+  const period = periodsData || [];
+
   const [showTable, setShowTable] = useState(false);
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState("");
-  const [grade, setGrade] = useState([]);
-  const [period, setPeriod] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState("");
   const [asignature, setAsignature] = useState("");
   const [student, setStudents] = useState([]);
@@ -14,104 +24,29 @@ export const GradeEntryPage = () => {
   const [isValid, setIsValid] = useState(true);
   const [load, setLoad] = useState(false);
   const [filterLoad, setFilterLoad] = useState(false);
-  const { store } = useAuth();
-  const token = store.access_token;
 
   useEffect(() => {
-    const profileTeacher = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/profile`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setSelectedCourseId(data.teacher.courses[0].id);
-          setAsignature(data.teacher.courses[0].name);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    const grades = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/setup/grade_levels`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setGrade(data);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    const periods = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/periods`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const responseData = await response.json();
-        if (response.ok) {
-          setPeriod(responseData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    profileTeacher();
-    grades();
-    periods();
-  }, []);
+    if (profileData) {
+      setSelectedCourseId(profileData.teacher.courses[0].id);
+      setAsignature(profileData.teacher.courses[0].name);
+    }
+  }, [profileData]);
 
   useEffect(() => {
-    if (grade !== [] && period !== [] && selectedCourseId !== "") {
+    if (grade.length > 0 && period.length > 0 && selectedCourseId !== "") {
       setFilterLoad(true);
     }
   }, [grade, period, selectedCourseId]);
 
   const students = async () => {
     try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/teacher/grades?grade_level_id=${selectedYear}&course_id=${selectedCourseId}&period=${selectedPeriod}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const responseData = await apiClient.get(
+        `/api/teacher/grades?grade_level_id=${selectedYear}&course_id=${selectedCourseId}&period=${selectedPeriod}`
       );
-      const responseData = await response.json();
-      if (response.ok) {
-        console.log(responseData);
-        const newData = transformData(responseData);
-        setStudents(newData);
-        setLoad(true);
-      }
+      console.log(responseData);
+      const newData = transformData(responseData);
+      setStudents(newData);
+      setLoad(true);
     } catch (error) {
       console.log(error);
     }
@@ -194,53 +129,28 @@ export const GradeEntryPage = () => {
     };
 
     try {
-      let response;
       let responseData;
       if (studentToSave.gradeId) {
-        response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/grade/${
-            studentToSave.gradeId
-          }`,
+        responseData = await apiClient.put(
+          `/api/grade/${studentToSave.gradeId}`,
           {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              participation: Number(studentToSave.participation),
-              homework: Number(studentToSave.homework),
-              midterm: Number(studentToSave.midterm),
-              final_exam: Number(studentToSave.final),
-            }),
+            participation: Number(studentToSave.participation),
+            homework: Number(studentToSave.homework),
+            midterm: Number(studentToSave.midterm),
+            final_exam: Number(studentToSave.final),
           }
         );
       } else {
-        response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/grade`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              ...payload,
-              enrollment_id: studentToSave.enrollment_id,
-              period: selectedPeriod,
-            }),
-          }
-        );
+        responseData = await apiClient.post("/api/grade", {
+          ...payload,
+          enrollment_id: studentToSave.enrollment_id,
+          period: selectedPeriod,
+        });
       }
 
-      responseData = await response.json();
-      if (response.ok) {
-        console.log("Nota actualizada", responseData);
-        setEditingId(null);
-        students();
-      } else {
-        console.error("Error al actualizar", responseData.error);
-      }
+      console.log("Nota actualizada", responseData);
+      setEditingId(null);
+      students();
     } catch (error) {
       console.log(error);
     }

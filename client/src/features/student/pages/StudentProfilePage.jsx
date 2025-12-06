@@ -2,43 +2,15 @@ import { useEffect, useState } from "react";
 import student from "../../../assets/img/students.png";
 import { useAuth } from "../../../context/AuthProvider";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useFetch } from "../../../common/hooks/useFetch";
 
 export const StudentProfilePage = () => {
-  const [user, setUser] = useState([]);
-  const [load, setLoad] = useState(false);
+  const { data: user, loading: load, error } = useFetch("/api/profile");
   const [coords, setCoords] = useState(null);
-  const { store } = useAuth();
-  const token = store.access_token;
-  useEffect(() => {
-    const user = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/profile`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        if (response.ok) {
-          console.log(data);
-          setUser(data);
-          setLoad(true);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    user();
-  }, []);
 
   useEffect(() => {
     const latLon = async () => {
-      if (!user.location) return;
+      if (!user?.location) return;
 
       try {
         const response = await fetch(

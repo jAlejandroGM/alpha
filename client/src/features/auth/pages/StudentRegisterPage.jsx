@@ -1,61 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { useFetch } from "../../../common/hooks/useFetch";
+import { apiClient } from "../../../common/api/apiClient";
 
 export const StudentRegisterPage = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [load, setLoad] = useState(false);
-  const [courses, setCourses] = useState([]);
+  const { data: coursesData, loading } = useFetch("/api/setup/grade_levels");
+  const courses = coursesData || [];
+  const load = !loading;
   const [msg, setMsg] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    course();
-  }, []);
-
-  const course = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/setup/grade_levels`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setLoad(true);
-        setCourses(data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const procesarDatos = async (data) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/register/student`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-      const responseData = await response.json();
-      if (response.ok) {
-        setShowConfirmation(true);
-      } else {
-        setMsg(responseData.msg);
-      }
+      await apiClient.post("/api/register/student", data);
+      setShowConfirmation(true);
     } catch (error) {
       console.log(error);
+      if (error.data && error.data.msg) {
+        setMsg(error.data.msg);
+      } else {
+        setMsg("Error en el registro");
+      }
     }
   };
 

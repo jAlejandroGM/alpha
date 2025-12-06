@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { apiClient } from "../../../common/api/apiClient";
 
 export const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -11,27 +12,11 @@ export const ForgotPasswordPage = () => {
     e.preventDefault(); // evita recarga
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/forgot-password`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setShowConfirmation(true);
-      } else {
-        setMsg(data.error || data.msg);
-      }
+      await apiClient.post("/api/forgot-password", { email });
+      setShowConfirmation(true);
     } catch (error) {
       console.error("Error en la solicitud:", error);
-      setMsg("Error en la conexión con el servidor.");
+      setMsg(error.message || "Error en la conexión con el servidor.");
     }
   };
 

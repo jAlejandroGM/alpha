@@ -1,104 +1,19 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthProvider";
+import { useFetch } from "../../../common/hooks/useFetch";
 
 export const AllGradesPage = () => {
   const { store } = useAuth();
   const token = store.access_token;
-  const [students, setStudents] = useState([]);
-  const [asignature, setAsignature] = useState([]);
-  const [period, setPeriods] = useState([]);
-  const [grade, setGrades] = useState([]);
+  const { data: studentsData } = useFetch("/api/teacher/grades");
+  const { data: asignatureData } = useFetch("/api/courses");
+  const { data: periodsData } = useFetch("/api/periods");
+  const { data: gradesData } = useFetch("/api/setup/grade_levels");
 
-  useEffect(() => {
-    const students = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/teacher/grades`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const responseData = await response.json();
-        if (response.ok) {
-          setStudents(responseData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const asignatures = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/courses`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const responseData = await response.json();
-        if (response.ok) {
-          setAsignature(responseData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const periods = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/periods`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const responseData = await response.json();
-        if (response.ok) {
-          setPeriods(responseData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const grades = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/setup/grade_levels`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const responseData = await response.json();
-        if (response.ok) {
-          setGrades(responseData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    grades();
-    periods();
-    asignatures();
-    students();
-  }, []);
+  const students = studentsData || [];
+  const asignature = asignatureData || [];
+  const period = periodsData || [];
+  const grade = gradesData || [];
 
   return (
     <div className="container table-responsive my-5">

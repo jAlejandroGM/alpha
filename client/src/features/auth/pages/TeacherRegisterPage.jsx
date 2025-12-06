@@ -2,59 +2,28 @@ import React, { useState, useEffect } from "react";
 import useGlobalReducer from "../../../common/hooks/useGlobalReducer.jsx";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useFetch } from "../../../common/hooks/useFetch";
+import { apiClient } from "../../../common/api/apiClient";
 
 export const TeacherRegisterPage = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [asignatures, setAsignature] = useState([]);
+  const { data: asignaturesData } = useFetch("/api/courses");
+  const asignatures = asignaturesData || [];
   const [msg, setMsg] = useState("");
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const listAsignature = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/courses`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        if (response.ok) {
-          setAsignature(data);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    listAsignature();
-  }, []);
 
   const procesarDatos = async (data) => {
     console.log("Informacion del Registro", data);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/register/teacher`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-      const responseData = await response.json();
-      if (response.ok) {
-        setShowConfirmation(true);
-      } else {
-        setMsg(response.msg);
-      }
+      await apiClient.post("/api/register/teacher", data);
+      setShowConfirmation(true);
     } catch (error) {
       console.log(error);
+      if (error.data && error.data.msg) {
+        setMsg(error.data.msg);
+      } else {
+        setMsg("Error en el registro");
+      }
     }
   };
 

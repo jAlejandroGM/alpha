@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthProvider";
+import { useFetch } from "../../../common/hooks/useFetch";
+import { apiClient } from "../../../common/api/apiClient";
 
 export const StudentGradePage = () => {
-  const [asignature, setAsignature] = useState([]);
-  const [period, setPeriod] = useState([]);
+  const { data: asignatureData } = useFetch("/api/courses");
+  const { data: periodData } = useFetch("/api/periods");
+
+  const asignature = asignatureData || [];
+  const period = periodData || [];
+
   const [selectedAsignature, setSelectedAsignature] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState("");
   const [showTable, setShowTable] = useState(false);
@@ -12,54 +18,9 @@ export const StudentGradePage = () => {
   const [grades, setGrades] = useState([]);
   const { store } = useAuth();
   const token = store.access_token;
-  useEffect(() => {
-    const asignatures = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/courses`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setAsignature(data);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    const periods = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/periods`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const responseData = await response.json();
-        if (response.ok) {
-          setPeriod(responseData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    asignatures();
-    periods();
-  }, []);
 
   useEffect(() => {
-    if (period !== "" && asignature !== "") {
+    if (period.length > 0 && asignature.length > 0) {
       setLoadFilters(true);
     }
   }, [period, asignature]);
@@ -73,28 +34,16 @@ export const StudentGradePage = () => {
 
   const students = async () => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/student/grades`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const responseData = await response.json();
-      if (response.ok) {
-        console.log(responseData);
-        const filtered = responseData.filter((item) => {
-          return (
-            item.course === selectedAsignature &&
-            item.period === parseInt(selectedPeriod)
-          );
-        });
-        setGrades(filtered);
-        setLoad(true);
-      }
+      const responseData = await apiClient.get("/api/student/grades");
+      console.log(responseData);
+      const filtered = responseData.filter((item) => {
+        return (
+          item.course === selectedAsignature &&
+          item.period === parseInt(selectedPeriod)
+        );
+      });
+      setGrades(filtered);
+      setLoad(true);
     } catch (error) {
       console.log(error);
     }

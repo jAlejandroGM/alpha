@@ -1,39 +1,12 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../../../context/AuthProvider";
+import { useFetch } from "../../../common/hooks/useFetch";
 
 export const StudentSchedulePage = () => {
-  const [schedule, setSchedule] = useState([]);
-  const { store } = useAuth();
-  const [load, setLoad] = useState(false);
-  const token = store.access_token;
-  useEffect(() => {
-    const schedule = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/student/schedule`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setSchedule(data);
-          setLoad(true);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  const { data, loading } = useFetch("/api/student/schedule");
+  const schedule = data || [];
 
-    schedule();
-  }, []);
   return (
     <div className="container table-responsive my-5">
-      {load ? (
+      {!loading ? (
         <div className="row">
           <h1 className="fs-2 p-0">Mi horario:</h1>
           <table className="col-12 table table-striped table-bordered text-center mt-5 schedule-table">

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import imageHomeAdmin from "../../../assets/img/login.jpg";
 import { useState } from "react";
 import { useAuth } from "../../../context/AuthProvider";
+import { apiClient } from "../../../common/api/apiClient";
 
 export const AdminLoginPage = () => {
   const { login } = useAuth();
@@ -16,31 +17,17 @@ export const AdminLoginPage = () => {
       setMsg("Completa los campos correctamente.");
       return;
     } else setMsg("");
-    const body = JSON.stringify({ email, password });
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/login/admin`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body,
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        login(data.access_token, data.user);
-        navigate("/admin/dashboard/profile");
-      } else {
-        setMsg("Credenciales inválidas");
-      }
+      const data = await apiClient.post("/api/login/admin", {
+        email,
+        password,
+      });
+      login(data.access_token, data.user);
+      navigate("/admin/dashboard/profile");
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
-      setMsg("Error en la conexión con el servidor.");
+      setMsg("Credenciales inválidas");
     }
   };
 

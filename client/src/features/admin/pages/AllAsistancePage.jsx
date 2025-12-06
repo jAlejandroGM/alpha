@@ -1,84 +1,18 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthProvider.jsx";
+import { useFetch } from "../../../common/hooks/useFetch";
 
 export const AllAsistancePage = () => {
-  const { store } = useAuth();
-  const token = store.access_token;
-  const [students, setStudents] = useState([]);
-  const [period, setPeriods] = useState([]);
-  const [grade, setGrades] = useState([]);
-  const [load, setLoad] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  useEffect(() => {
-    const students = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/students`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const responseData = await response.json();
-        if (response.ok) {
-          console.log(responseData);
-          setStudents(responseData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    const periods = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/periods`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const responseData = await response.json();
-        if (response.ok) {
-          setPeriods(responseData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  const { data: studentsData } = useFetch("/api/students");
+  const { data: periodsData } = useFetch("/api/periods");
+  const { data: gradesData } = useFetch("/api/setup/grade_levels");
 
-    const grades = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/setup/grade_levels`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const responseData = await response.json();
-        if (response.ok) {
-          setGrades(responseData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    if (grade != [] && period != []) {
-      setLoad(true);
-    }
-    grades();
-    periods();
-    students();
-  }, []);
+  const students = studentsData || [];
+  const period = periodsData || [];
+  const grade = gradesData || [];
+  const load = true;
 
   const [showTable, setShowTable] = useState(false);
 

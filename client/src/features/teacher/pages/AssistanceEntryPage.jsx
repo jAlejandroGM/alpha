@@ -1,13 +1,20 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthProvider.jsx";
+import { useFetch } from "../../../common/hooks/useFetch";
+import { apiClient } from "../../../common/api/apiClient";
 
 export const AssistanceEntryPage = () => {
   const { store } = useAuth();
   const token = store.access_token;
 
+  const { data: periodsData } = useFetch("/api/periods");
+  const { data: gradesData } = useFetch("/api/setup/grade_levels");
+  const { data: profileData } = useFetch("/api/profile");
+
+  const periods = periodsData || [];
+  const grades = gradesData || [];
+
   const [students, setStudents] = useState([]);
-  const [periods, setPeriods] = useState([]);
-  const [grades, setGrades] = useState([]);
   const [selectedGrade, setSelectedGrade] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState("");
   const [editingId, setEditingId] = useState(null);
@@ -17,83 +24,25 @@ export const AssistanceEntryPage = () => {
   const [load, setLoad] = useState(false);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/periods`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then(setPeriods)
-      .catch(console.error);
-
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/setup/grade_levels`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then(setGrades)
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    if (grades != [] && periods != []) {
+    if (grades.length > 0 && periods.length > 0) {
       setLoad(true);
     }
   }, [grades, periods]);
 
-  const getTeacherProfile = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/profile`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const user = await response.json();
-      return user?.teacher?.courses[0]?.id || null;
-    } catch (err) {
-      console.error("Error al obtener perfil de profesor", err);
-      return null;
-    }
-  };
-
   const handleSearch = async () => {
-    const courseId = await getTeacherProfile();
+    const courseId = profileData?.teacher?.courses?.[0]?.id;
     if (!selectedGrade || !selectedPeriod || !courseId) return;
 
     try {
-      const res = await fetch(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/teacher/students?grade_level_id=${selectedGrade}&course_id=${courseId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const studentsData = await apiClient.get(
+        `/api/teacher/students?grade_level_id=${selectedGrade}&course_id=${courseId}`
       );
-
-      const text = await res.text();
-      let studentsData;
-      try {
-        studentsData = JSON.parse(text);
-      } catch (jsonErr) {
-        console.error("JSON inválido:", jsonErr, text);
-        return;
-      }
 
       const updated = await Promise.all(
         studentsData.map(async (e) => {
-          const attRes = await fetch(
-            `${import.meta.env.VITE_BACKEND_URL}/api/attendance?enrollment_id=${
-              e.enrollment_id
-            }`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
+          const attData = await apiClient.get(
+            `/api/attendance?enrollment_id=${e.enrollment_id}`
           );
-          const attText = await attRes.text();
-          let attData = [];
-          try {
-            attData = JSON.parse(attText);
-          } catch (err) {
-            console.error("Historial no JSON:", err, attText);
-          }
 
           const faltas = attData.filter((a) => a.status === "falto").length;
           return {
@@ -150,26 +99,13 @@ export const AssistanceEntryPage = () => {
     const status = statusMap[statusKey];
 
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/attendance`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            enrollment_id: student.enrollment_id,
-            date: new Date().toISOString().slice(0, 10),
-            status,
-          }),
-        }
-      );
+      await apiClient.post("/api/attendance", {
+        enrollment_id: student.enrollment_id,
+        date: new Date().toISOString().slice(0, 10),
+        status,
+      });
 
-      const data = await res.json();
-      if (res.ok) {
-        handleSearch();
-      }
+      handleSearch();
     } catch (err) {
       console.error(err);
     }

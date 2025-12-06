@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { apiClient } from "../../../common/api/apiClient";
 
 export const ResetPasswordPage = () => {
   const { token } = useParams();
@@ -18,24 +19,10 @@ export const ResetPasswordPage = () => {
     }
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/reset-password/${token}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setShowConfirmation(true);
-      } else {
-        setMsg(data.error || "Error al actualizar la contraseña");
-      }
+      await apiClient.post(`/api/reset-password/${token}`, { password });
+      setShowConfirmation(true);
     } catch (error) {
-      setMsg("Error en la conexión con el servidor");
+      setMsg(error.message || "Error al actualizar la contraseña");
     }
   };
 

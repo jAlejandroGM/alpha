@@ -4,6 +4,7 @@ import studentImg from "../../../assets/img/students.png";
 import teacherImg from "../../../assets/img/teacher.png";
 import { useAuth } from "../../../context/AuthProvider.jsx";
 import { Link } from "react-router-dom";
+import { apiClient } from "../../../common/api/apiClient";
 
 //INSTALAR LIBRERIA : npm install react-leaflet@4.2.1 leaflet
 //INSTALAR LIBRERIA : npm install leaflet-defaulticon-compatibility
@@ -27,38 +28,26 @@ export const LoginPage = () => {
 
     setMsg("");
 
-    const body = JSON.stringify({ email, password });
-
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/login/${user}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body,
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (
-          data.msg === "Estudiante no encontrado" ||
-          data.msg === "Contraseña incorrecta"
-        ) {
-          setMsg("Credenciales inválidas");
-        } else {
-          setMsg(data.msg);
-        }
-      } else {
-        login(data.access_token, data.user);
-        navigate(`/${user}/dashboard/profile`);
-      }
+      const data = await apiClient.post(`/api/login/${user}`, {
+        email,
+        password,
+      });
+      login(data.access_token, data.user);
+      navigate(`/${user}/dashboard/profile`);
     } catch (error) {
       console.log(error);
-      setMsg("Error en la conexión con el servidor.");
+      if (
+        error.data &&
+        (error.data.msg === "Estudiante no encontrado" ||
+          error.data.msg === "Contraseña incorrecta")
+      ) {
+        setMsg("Credenciales inválidas");
+      } else if (error.data && error.data.msg) {
+        setMsg(error.data.msg);
+      } else {
+        setMsg("Error en la conexión con el servidor.");
+      }
     }
   };
 
