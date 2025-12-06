@@ -13,7 +13,7 @@ export const RoleSelectionPage = () => {
           </p>
           <div className="d-flex flex-column flex-md-row justify-content-center gap-4">
             <Link
-              to="/signup/alumno"
+              to="/signup/student"
               className="user-option border border-2 colorBorderSignup rounded-4 p-3 text-center text-black text-decoration-none shadow-sm bg-white"
             >
               <img
@@ -24,7 +24,7 @@ export const RoleSelectionPage = () => {
               <p className="h4 mb-0">Soy alumno</p>
             </Link>
             <Link
-              to="/signup/profesor"
+              to="/signup/teacher"
               className="user-option border border-2 colorBorderSignup rounded-4 p-3 text-center text-black text-decoration-none shadow-sm bg-white"
             >
               <img

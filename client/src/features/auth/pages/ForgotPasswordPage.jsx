@@ -5,7 +5,7 @@ export const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
   const [msg, setMsg] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // evita recarga
@@ -97,4 +97,4 @@ export const ForgotPasswordPage = () => {
   );
 };
 
-export default SolicitarToken;
+export default ForgotPasswordPage;

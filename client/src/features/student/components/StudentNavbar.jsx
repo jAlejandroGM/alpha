@@ -45,7 +45,7 @@ export const StudentNavbar = () => {
             <ul className="list-unstyled text-start text-decoration-none d-flex flex-column gap-3 ps-3">
               <li className="my-3">
                 <Link
-                  to="/student/dashboard/notas"
+                  to="/student/dashboard/grades"
                   className="text-black text-decoration-none fw-semibold hovNav"
                   onClick={closeMenu}
                 >
@@ -54,7 +54,7 @@ export const StudentNavbar = () => {
               </li>
               <li className="my-3">
                 <Link
-                  to="/student/dashboard/horario"
+                  to="/student/dashboard/schedule"
                   className="text-black text-decoration-none fw-semibold hovNav"
                   onClick={closeMenu}
                 >

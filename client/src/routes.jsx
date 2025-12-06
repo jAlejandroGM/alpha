@@ -5,35 +5,43 @@ import {
 } from "react-router-dom";
 
 // Auth Features
-import { LoginPage } from "./features/auth/pages/LoginPage";
-import { AdminLoginPage } from "./features/admin/pages/AdminLoginPage";
-import { RoleSelectionPage } from "./features/auth/pages/RoleSectionPage";
-import { StudentRegisterPage } from "./features/auth/pages/StudentRegisterPage";
-import { TeacherRegisterPage } from "./features/auth/pages/TeacherRegisterPage";
-import { ForgotPasswordPage } from "./features/auth/pages/ForgotPasswordPage";
-import { ResetPasswordPage } from "./features/auth/pages/ResetPasswordPage";
-import { AuthLayout } from "./features/auth/pages/AuthLayout";
+import {
+  LoginPage,
+  RoleSelectionPage,
+  StudentRegisterPage,
+  TeacherRegisterPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+  AuthLayout,
+} from "./features/auth";
 
 // Admin Features
-import { AdminLayout } from "./features/admin/pages/AdminLayout";
-import { AdminProfilePage } from "./features/admin/pages/AdminProfilePage";
-import { AllGradesPage } from "./features/admin/pages/AllGradesPage";
-import { AllAsistancePage } from "./features/admin/pages/AllAsistancePage";
-import { TeacherManagementPage } from "./features/admin/pages/TeacherManagementPage";
-import { RegistrationRequestPage } from "./features/admin/pages/RegistrationRequestPage";
+import {
+  AdminLoginPage,
+  AdminLayout,
+  AdminProfilePage,
+  AllGradesPage,
+  AllAsistancePage,
+  TeacherManagementPage,
+  RegistrationRequestPage,
+} from "./features/admin";
 
 // Student Features
-import { StudentLayout } from "./features/student/pages/StudentLayout";
-import { StudentProfilePage } from "./features/student/pages/StudentProfilePage";
-import { StudentSchedulePage } from "./features/student/pages/StudentSchedulePage";
-import { StudentGradePage } from "./features/student/pages/StudentGradePage";
+import {
+  StudentLayout,
+  StudentProfilePage,
+  StudentSchedulePage,
+  StudentGradePage,
+} from "./features/student";
 
 // Teacher Features
-import { TeacherLayout } from "./features/teacher/pages/TeacherLayout";
-import { TeacherProfilePage } from "./features/teacher/pages/TeacherProfilePage";
-import { GradeEntryPage } from "./features/teacher/pages/GradeEntryPage";
-import { AssistanceEntryPage } from "./features/teacher/pages/AssistanceEntryPage";
-import { TeacherSchedulePage } from "./features/teacher/pages/TeacherSchedulePage";
+import {
+  TeacherLayout,
+  TeacherProfilePage,
+  GradeEntryPage,
+  AssistanceEntryPage,
+  TeacherSchedulePage,
+} from "./features/teacher";
 
 // Common
 import PrivateRoute from "./common/components/PrivateRoute";
@@ -52,8 +60,8 @@ export const router = createBrowserRouter(
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/signup" element={<RoleSelectionPage />} />
-        <Route path="/signup/alumno" element={<StudentRegisterPage />} />
-        <Route path="/signup/profesor" element={<TeacherRegisterPage />} />
+        <Route path="/signup/student" element={<StudentRegisterPage />} />
+        <Route path="/signup/teacher" element={<TeacherRegisterPage />} />
       </Route>
 
       <Route
@@ -66,19 +74,19 @@ export const router = createBrowserRouter(
       >
         <Route path="/admin/dashboard/profile" element={<AdminProfilePage />} />
         <Route
-          path="/admin/dashboard/alumnos/notas"
+          path="/admin/dashboard/students/grades"
           element={<AllGradesPage />}
         />
         <Route
-          path="/admin/dashboard/alumnos/asistencia"
+          path="/admin/dashboard/students/attendance"
           element={<AllAsistancePage />}
         />
         <Route
-          path="/admin/dashboard/profesores"
+          path="/admin/dashboard/teachers"
           element={<TeacherManagementPage />}
         />
         <Route
-          path="/admin/dashboard/solicitudes"
+          path="/admin/dashboard/requests"
           element={<RegistrationRequestPage />}
         />
       </Route>
@@ -96,15 +104,15 @@ export const router = createBrowserRouter(
           element={<TeacherProfilePage />}
         />
         <Route
-          path="/teacher/dashboard/alumnos/notas"
+          path="/teacher/dashboard/students/grades"
           element={<GradeEntryPage />}
         />
         <Route
-          path="/teacher/dashboard/alumnos/asistencia"
+          path="/teacher/dashboard/students/attendance"
           element={<AssistanceEntryPage />}
         />
         <Route
-          path="/teacher/dashboard/horario"
+          path="/teacher/dashboard/schedule"
           element={<TeacherSchedulePage />}
         />
       </Route>
@@ -121,9 +129,12 @@ export const router = createBrowserRouter(
           path="/student/dashboard/profile"
           element={<StudentProfilePage />}
         />
-        <Route path="/student/dashboard/notas" element={<StudentGradePage />} />
         <Route
-          path="/student/dashboard/horario"
+          path="/student/dashboard/grades"
+          element={<StudentGradePage />}
+        />
+        <Route
+          path="/student/dashboard/schedule"
           element={<StudentSchedulePage />}
         />
       </Route>

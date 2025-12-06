@@ -48,7 +48,7 @@ export const AdminNavbar = () => {
 									</Link>
 									<ul className="dropdown-menu dropdown-menu-center-vertical ms-3">
 										<li>
-											<Link to="/admin/dashboard/alumnos/notas" className="dropdown-item" onClick={closeMenu}>
+											<Link to="/admin/dashboard/students/grades" className="dropdown-item" onClick={closeMenu}>
 												Notas
 											</Link>
 										</li>
@@ -56,7 +56,7 @@ export const AdminNavbar = () => {
 											<hr className="dropdown-divider" />
 										</li>
 										<li>
-											<Link to="/admin/dashboard/alumnos/asistencia" className="dropdown-item" onClick={closeMenu}>
+											<Link to="/admin/dashboard/students/attendance" className="dropdown-item" onClick={closeMenu}>
 												Asistencia
 											</Link>
 										</li>
@@ -64,13 +64,13 @@ export const AdminNavbar = () => {
 								</div>
 							</li>
 							<li className="my-3">
-								<Link to="/admin/dashboard/profesores" className="text-black text-decoration-none fw-semibold hovNav" onClick={closeMenu}>
+								<Link to="/admin/dashboard/teachers" className="text-black text-decoration-none fw-semibold hovNav" onClick={closeMenu}>
 									Profesores
 								</Link>
 							</li> */}
               <li className="my-3">
                 <Link
-                  to="/admin/dashboard/solicitudes"
+                  to="/admin/dashboard/requests"
                   className="text-black text-decoration-none fw-semibold hovNav"
                   onClick={closeMenu}
                 >

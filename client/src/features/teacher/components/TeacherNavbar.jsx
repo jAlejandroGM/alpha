@@ -60,7 +60,7 @@ export const TeacherNavbar = () => {
                   <ul className="list-unstyled mt-4 ">
                     <li className="mb-4">
                       <Link
-                        to="/teacher/dashboard/alumnos/notas"
+                        to="/teacher/dashboard/students/grades"
                         className="text-black hovNav text-decoration-none"
                         onClick={closeMenu}
                       >
@@ -69,7 +69,7 @@ export const TeacherNavbar = () => {
                     </li>
                     <li className="mb-2">
                       <Link
-                        to="/teacher/dashboard/alumnos/asistencia"
+                        to="/teacher/dashboard/students/attendance"
                         className="text-black hovNav text-decoration-none"
                         onClick={closeMenu}
                       >
@@ -81,7 +81,7 @@ export const TeacherNavbar = () => {
               </li>
               <li className="my-3">
                 <Link
-                  to="/teacher/dashboard/horario"
+                  to="/teacher/dashboard/schedule"
                   className="text-black text-decoration-none fw-semibold hovNav"
                   onClick={closeMenu}
                 >
